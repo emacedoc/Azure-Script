@@ -1,6 +1,6 @@
 
 Param(
-   $AutomationRG = "BigPRD-OMS",
+   $AutomationRG = "RG_OMS_Wintel",
    $AutomationAcct = "VMAuto",
    $StartType = "Auto"
 )
