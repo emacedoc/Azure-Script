@@ -1,0 +1,32 @@
+workflow Start-AzureVM
+{   
+    #Configuração do Script para Ligar a VM, criado por Michel Jatobá.
+    
+    $AutomationCredential = "userautomation@dominio.com.br" # Credencial que vai ser utilizada para executar o Script.
+    $AzureSubscription = "Subscrption Demo" #Selecione o nome da Subscription
+    $ServiceNamesToIgnore = @("Server-01","Server-02") # Adicione os "ServiceName" de cada Servidor que vai ser ligado.
+    $HostNamesToIgnore = @("Server01-01","Server-02") # Adicione os "HostName" de cada Servidor que vai ser ligado.
+    
+    $Cred = Get-AutomationPSCredential -Name $AutomationCredential
+    $output = Add-AzureAccount -Credential $Cred 
+    Select-AzureSubscription -SubscriptionName $AzureSubscription
+ 
+    Write-Output "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    
+    Write-Output "Iniciando Serviço"
+    
+    Write-Output "Iniciando as VMs!!!"
+ 
+    Get-AzureVM | ? -Filterscript { $_.Status -eq 'StoppedDeallocated' `
+                        -and $ServiceNamesToIgnore -notcontains $_.ServiceName `
+                        -and $HostNamesToIgnore -notcontains $_.Name } |
+           ForEach-Object {
+                Write-Output "Ligando as VMs : $($_.Name), ServiceName $($_.ServiceName)"
+                $null = Start-AzureVM -Name $_.Name -ServiceName $_.ServiceName 
+            }
+     
+     Write-Output "Ligamento Completo da VMs "
+    
+    Write-Output "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+ 
+}
